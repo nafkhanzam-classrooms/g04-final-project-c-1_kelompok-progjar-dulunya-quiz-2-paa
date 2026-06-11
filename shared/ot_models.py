@@ -3,11 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class TextOperation:
-
-    operation: str
-    # insert
-    # delete
-    # append
+    operation: str       # insert | delete | append
     position: int
     content: str
     author: str
