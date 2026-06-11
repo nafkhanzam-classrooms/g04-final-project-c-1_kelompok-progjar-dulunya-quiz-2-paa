@@ -3,42 +3,44 @@
 import tkinter as tk
 
 from shared.protocol import MessageType
+from gui import theme
 
 
 class LoginFrame(tk.Frame):
     def __init__(self, parent, net, on_logged_in, **kwargs):
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, bg=theme.BG, **kwargs)
         self.net = net
         self.on_logged_in = on_logged_in
         self._build()
 
     def _build(self):
-        wrapper = tk.Frame(self)
-        wrapper.place(relx=0.5, rely=0.5, anchor="center")
+        card = tk.Frame(self, bg=theme.PANEL, padx=34, pady=28)
+        card.place(relx=0.5, rely=0.5, anchor="center")
 
-        tk.Label(wrapper, text="Collaborative Editor", font=(None, 20, "bold")).grid(
-            row=0, column=0, columnspan=2, pady=(0, 20))
+        tk.Label(card, text="Collaborative Editor", font=theme.FONT_TITLE,
+                 bg=theme.PANEL, fg=theme.TEXT).grid(row=0, column=0, columnspan=2)
+        tk.Label(card, text="masuk dulu buat mulai kolaborasi", font=theme.FONT_SM,
+                 bg=theme.PANEL, fg=theme.MUTED).grid(row=1, column=0, columnspan=2, pady=(2, 20))
 
-        tk.Label(wrapper, text="Server host:").grid(row=1, column=0, sticky="e", pady=4)
-        self.host_entry = tk.Entry(wrapper)
-        self.host_entry.insert(0, "127.0.0.1")
-        self.host_entry.grid(row=1, column=1, pady=4)
+        def field(row, label, default=""):
+            tk.Label(card, text=label, font=theme.FONT, bg=theme.PANEL, fg=theme.TEXT).grid(
+                row=row, column=0, sticky="e", padx=(0, 10), pady=6)
+            e = theme.entry(card, width=22)
+            if default:
+                e.insert(0, default)
+            e.grid(row=row, column=1, pady=6, ipady=4)
+            return e
 
-        tk.Label(wrapper, text="Port:").grid(row=2, column=0, sticky="e", pady=4)
-        self.port_entry = tk.Entry(wrapper)
-        self.port_entry.insert(0, "8888")
-        self.port_entry.grid(row=2, column=1, pady=4)
-
-        tk.Label(wrapper, text="Username:").grid(row=3, column=0, sticky="e", pady=4)
-        self.user_entry = tk.Entry(wrapper)
-        self.user_entry.grid(row=3, column=1, pady=4)
+        self.host_entry = field(2, "Server host:", "127.0.0.1")
+        self.port_entry = field(3, "Port:", "8888")
+        self.user_entry = field(4, "Username:")
         self.user_entry.bind("<Return>", lambda e: self._connect())
 
-        self.connect_btn = tk.Button(wrapper, text="Connect", width=20, command=self._connect)
-        self.connect_btn.grid(row=4, column=0, columnspan=2, pady=(16, 0))
+        self.connect_btn = theme.button(card, "Connect", self._connect, primary=True)
+        self.connect_btn.grid(row=5, column=0, columnspan=2, pady=(20, 0), sticky="ew", ipady=2)
 
-        self.status = tk.Label(wrapper, text="", fg="red")
-        self.status.grid(row=5, column=0, columnspan=2, pady=(8, 0))
+        self.status = tk.Label(card, text="", fg=theme.DANGER, bg=theme.PANEL, font=theme.FONT_SM)
+        self.status.grid(row=6, column=0, columnspan=2, pady=(10, 0))
 
         self.user_entry.focus_set()
 
@@ -54,14 +56,14 @@ class LoginFrame(tk.Frame):
             self.status.config(text="Username required")
             return
 
-        self.status.config(text="Connecting...", fg="black")
+        self.status.config(text="Connecting...", fg=theme.MUTED)
         self.connect_btn.config(state="disabled")
         self.update_idletasks()
 
         try:
             self.net.connect(host, port)
         except OSError as exc:
-            self.status.config(text=f"Cannot connect: {exc}", fg="red")
+            self.status.config(text=f"Cannot connect: {exc}", fg=theme.DANGER)
             self.connect_btn.config(state="normal")
             return
 
@@ -77,9 +79,9 @@ class LoginFrame(tk.Frame):
         if message.get("ok"):
             self.on_logged_in(self.net.username)
         else:
-            self.status.config(text=message.get("message", "Auth failed"), fg="red")
+            self.status.config(text=message.get("message", "Auth failed"), fg=theme.DANGER)
             self.connect_btn.config(state="normal")
 
     def _on_disconnect(self):
-        self.status.config(text="Disconnected from server", fg="red")
+        self.status.config(text="Disconnected from server", fg=theme.DANGER)
         self.connect_btn.config(state="normal")

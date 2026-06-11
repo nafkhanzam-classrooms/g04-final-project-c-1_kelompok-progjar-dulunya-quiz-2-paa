@@ -13,6 +13,7 @@ for _p in (_ROOT, _THIS_DIR):
         sys.path.insert(0, _p)
 
 from client.network.net_client import NetClient
+from gui import theme
 from gui.login import LoginFrame
 from gui.lobby import LobbyFrame
 from gui.main_window import EditorScreen
@@ -23,6 +24,7 @@ class App:
         self.root = tk.Tk()
         self.root.title("Collaborative Editor")
         self.root.geometry("1280x760")
+        self.root.configure(bg=theme.BG)
         self.root.protocol("WM_DELETE_WINDOW", self._quit)
 
         self.net = NetClient()

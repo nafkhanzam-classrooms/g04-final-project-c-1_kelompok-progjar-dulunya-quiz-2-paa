@@ -1,6 +1,7 @@
 import tkinter as tk
 
 from shared.protocol import MessageType
+from gui import theme
 
 EVERYONE = "Everyone"
 EMOJIS = ["👍", "❤️", "😂", "🎉", "🔥", "😮", "😢"]
@@ -24,55 +25,61 @@ class ChatFrame(tk.Frame):
         self._build()
 
     def _build(self):
-        tk.Label(self, text="Chat", bg=self.bg_color, font=(None, 12, "bold")).pack(
-            fill="x", padx=8, pady=(8, 4))
+        theme.header(self, "Chat").pack(fill="x")
 
         self.members_label = tk.Label(self, text="Members: -", bg=self.bg_color,
-                                      fg="#444", anchor="w", font=(None, 9))
-        self.members_label.pack(fill="x", padx=8)
+                                      fg=theme.MUTED, anchor="w", font=theme.FONT_SM)
+        self.members_label.pack(fill="x", padx=10, pady=(6, 0))
 
-        box = tk.Frame(self)
-        box.pack(fill="both", expand=True, padx=8, pady=(4, 4))
-        self.chat_display = tk.Text(box, wrap="word", state="disabled", bg="#f5f5ff")
+        box = tk.Frame(self, bg=self.bg_color)
+        box.pack(fill="both", expand=True, padx=8, pady=6)
+        self.chat_display = tk.Text(box, wrap="word", state="disabled", bd=0, padx=8, pady=6,
+                                    font=theme.FONT, bg="#f7f9fd", fg=theme.TEXT)
         scroll = tk.Scrollbar(box, command=self.chat_display.yview)
         self.chat_display.configure(yscrollcommand=scroll.set)
         scroll.pack(side="right", fill="y")
         self.chat_display.pack(side="left", fill="both", expand=True)
         self.chat_display.bind("<Button-1>", self._on_pick_message)
 
-        self.typing_label = tk.Label(self, text="", bg=self.bg_color, fg="#0a7",
-                                     anchor="w", font=(None, 9, "italic"))
-        self.typing_label.pack(fill="x", padx=8)
+        self.typing_label = tk.Label(self, text="", bg=self.bg_color, fg="#2a9d6e",
+                                     anchor="w", font=(theme.FONT_SM[0], 9, "italic"))
+        self.typing_label.pack(fill="x", padx=10)
 
         react_bar = tk.Frame(self, bg=self.bg_color)
         react_bar.pack(fill="x", padx=8)
-        tk.Label(react_bar, text="React:", bg=self.bg_color).pack(side="left")
+        tk.Label(react_bar, text="React:", bg=self.bg_color, fg=theme.MUTED,
+                 font=theme.FONT_SM).pack(side="left")
         for e in EMOJIS:
-            tk.Button(react_bar, text=e, width=2, relief="flat",
+            tk.Button(react_bar, text=e, width=2, relief="flat", bd=0, bg=self.bg_color,
+                      activebackground="#e7ecf8", cursor="hand2",
                       command=lambda em=e: self._react(em)).pack(side="left")
 
-        to_row = tk.Frame(self)
-        to_row.pack(fill="x", padx=8, pady=(4, 0))
-        tk.Label(to_row, text="To:", bg=self.bg_color).pack(side="left")
+        to_row = tk.Frame(self, bg=self.bg_color)
+        to_row.pack(fill="x", padx=10, pady=(4, 0))
+        tk.Label(to_row, text="To:", bg=self.bg_color, fg=theme.TEXT,
+                 font=theme.FONT_SM).pack(side="left")
         self.recipient_var = tk.StringVar(value=EVERYONE)
         self.recipient_menu = tk.OptionMenu(to_row, self.recipient_var, EVERYONE)
-        self.recipient_menu.config(width=14)
+        self.recipient_menu.config(width=14, font=theme.FONT_SM, relief="flat",
+                                   bg=theme.ACCENT2, activebackground="#d7deef",
+                                   highlightthickness=0, cursor="hand2")
         self.recipient_menu.pack(side="left", padx=(4, 0))
 
-        in_row = tk.Frame(self)
-        in_row.pack(fill="x", padx=8, pady=(4, 8))
-        self.emoji_btn = tk.Menubutton(in_row, text="😀", relief="raised")
+        in_row = tk.Frame(self, bg=self.bg_color)
+        in_row.pack(fill="x", padx=8, pady=8)
+        self.emoji_btn = tk.Menubutton(in_row, text="😀", relief="flat", bd=0,
+                                       bg=self.bg_color, activebackground="#e7ecf8", cursor="hand2")
         self.emoji_btn.pack(side="left", padx=(0, 4))
         emoji_menu = tk.Menu(self.emoji_btn, tearoff=0)
         for e in EMOJIS:
             emoji_menu.add_command(label=e, command=lambda em=e: self._insert_emoji(em))
         self.emoji_btn.config(menu=emoji_menu)
 
-        self.message_entry = tk.Entry(in_row)
-        self.message_entry.pack(side="left", fill="x", expand=True, padx=(0, 8))
+        self.message_entry = theme.entry(in_row)
+        self.message_entry.pack(side="left", fill="x", expand=True, padx=(0, 8), ipady=3)
         self.message_entry.bind("<Return>", lambda e: self._send_message())
         self.message_entry.bind("<KeyRelease>", self._on_keyrelease)
-        tk.Button(in_row, text="Send", command=self._send_message).pack(side="right")
+        theme.button(in_row, "Send", self._send_message, primary=True).pack(side="right")
 
     # kirim
     def _send_message(self):

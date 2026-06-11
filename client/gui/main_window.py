@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 from shared.protocol import MessageType
+from gui import theme
 from gui.file_browser import ProjectTreeFrame
 from gui.editor import TextEditorFrame
 from gui.chat_box import ChatFrame
@@ -22,34 +23,36 @@ class EditorScreen(tk.Frame):
         self._register_handlers()
 
     def _build(self):
-        self.paned_window = tk.PanedWindow(self, orient=tk.HORIZONTAL,
-                                           sashrelief=tk.RAISED, sashwidth=6)
+        self.configure(bg=theme.BG)
+        self.paned_window = tk.PanedWindow(self, orient=tk.HORIZONTAL, bg=theme.BG,
+                                           sashrelief=tk.FLAT, sashwidth=6)
         self.paned_window.pack(fill=tk.BOTH, expand=1)
 
         self.tree_panel = ProjectTreeFrame(
-            self.paned_window, bg_color="#ffecec", net=self.net,
+            self.paned_window, bg_color=theme.PANEL, net=self.net,
             room_id=self.room_id, on_open_file=self._open_file,
             width=240, height=400)
         self.editor_panel = TextEditorFrame(
-            self.paned_window, bg_color="#f4fff4", net=self.net,
+            self.paned_window, bg_color=theme.PANEL, net=self.net,
             room_id=self.room_id, width=600, height=400)
         self.chat_panel = ChatFrame(
-            self.paned_window, bg_color="#eef4ff", net=self.net,
+            self.paned_window, bg_color=theme.PANEL, net=self.net,
             room_id=self.room_id, width=280, height=400)
 
         self._refresh_panes()
         self._build_bottom_bar()
 
     def _build_bottom_bar(self):
-        bar = tk.Frame(self)
+        bar = tk.Frame(self, bg=theme.HEADER)
         bar.pack(fill="x", side="bottom")
-        tk.Label(bar, text=f"Project: {self.room_id}", fg="#333").pack(side="left", padx=8)
+        tk.Label(bar, text=f"Project: {self.room_id}", font=theme.FONT_SM,
+                 bg=theme.HEADER, fg="#cfd5e3").pack(side="left", padx=12)
 
-        self.toggle_dir_button = tk.Button(bar, text="Hide Tree", command=self._toggle_dir)
-        self.toggle_dir_button.pack(side="left", padx=8, pady=8)
-        self.toggle_chat_button = tk.Button(bar, text="Hide Chat", command=self._toggle_chat)
-        self.toggle_chat_button.pack(side="left", padx=8, pady=8)
-        tk.Button(bar, text="Leave Project", command=self._leave).pack(side="right", padx=8, pady=8)
+        self.toggle_dir_button = theme.button(bar, "Hide Tree", self._toggle_dir)
+        self.toggle_dir_button.pack(side="left", padx=6, pady=6)
+        self.toggle_chat_button = theme.button(bar, "Hide Chat", self._toggle_chat)
+        self.toggle_chat_button.pack(side="left", padx=6, pady=6)
+        theme.button(bar, "Leave Project", self._leave).pack(side="right", padx=10, pady=6)
 
     def _refresh_panes(self):
         for pane in (self.tree_panel, self.editor_panel, self.chat_panel):

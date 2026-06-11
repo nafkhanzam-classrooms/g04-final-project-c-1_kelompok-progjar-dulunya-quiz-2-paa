@@ -6,6 +6,7 @@ from tkinter import messagebox
 from tkinter import simpledialog
 
 from shared.protocol import MessageType
+from gui import theme
 
 
 class ProjectTreeFrame(tk.Frame):
@@ -88,20 +89,22 @@ class ProjectTreeFrame(tk.Frame):
         self.menu.tk_popup(event.x_root, event.y_root)
 
     def _build_contents(self):
-        header = tk.Label(self, text="Project Tree", bg=self.bg_color, font=(None, 12, "bold"))
-        header.pack(fill="x", padx=8, pady=(8, 4))
+        theme.header(self, "Project Tree").pack(fill="x")
 
-        button_frame = tk.Frame(self)
-        button_frame.pack(fill="x", padx=8, pady=(0, 4))
-        tk.Button(button_frame, text="New File", command=self._create_file).pack(side="left", padx=4)
-        tk.Button(button_frame, text="New Folder", command=self._create_folder).pack(side="left", padx=4)
+        button_frame = tk.Frame(self, bg=self.bg_color)
+        button_frame.pack(fill="x", padx=8, pady=8)
+        theme.button(button_frame, "New File", self._create_file).pack(side="left", padx=(0, 6))
+        theme.button(button_frame, "New Folder", self._create_folder).pack(side="left")
 
-        tree_container = tk.Frame(self)
+        tree_container = tk.Frame(self, bg=self.bg_color)
         tree_container.pack(fill="both", expand=True, padx=8, pady=(0, 8))
 
         style = ttk.Style()
-        style.configure("ProjectTreeview.Treeview", background="#ffffff",
-                        fieldbackground="#ffffff", rowheight=24)
+        style.configure("ProjectTreeview.Treeview", background=theme.PANEL,
+                        fieldbackground=theme.PANEL, foreground=theme.TEXT,
+                        font=theme.FONT, rowheight=26, borderwidth=0)
+        style.map("ProjectTreeview.Treeview",
+                  background=[("selected", theme.ACCENT)], foreground=[("selected", "white")])
 
         self.tree = ttk.Treeview(tree_container, show="tree", style="ProjectTreeview.Treeview")
         self.tree.pack(side="left", fill="both", expand=True)

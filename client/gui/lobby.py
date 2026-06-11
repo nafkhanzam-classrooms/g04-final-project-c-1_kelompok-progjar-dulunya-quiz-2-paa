@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog
 
 from shared.protocol import MessageType
+from gui import theme
 
 
 class LobbyFrame(tk.Frame):
@@ -24,27 +25,35 @@ class LobbyFrame(tk.Frame):
         })
 
     def _build(self):
-        header = tk.Frame(self)
-        header.pack(fill="x", padx=16, pady=12)
-        tk.Label(header, text="Projects", font=(None, 16, "bold")).pack(side="left")
-        tk.Label(header, text=f"Logged in as {self.username}", fg="#666").pack(side="right")
+        self.configure(bg=theme.BG)
 
-        body = tk.Frame(self)
-        body.pack(fill="both", expand=True, padx=16, pady=(0, 8))
+        header = tk.Frame(self, bg=theme.HEADER)
+        header.pack(fill="x")
+        tk.Label(header, text="Projects", font=theme.FONT_H, bg=theme.HEADER,
+                 fg="white").pack(side="left", padx=14, pady=10)
+        tk.Label(header, text=f"login sebagai {self.username}", font=theme.FONT_SM,
+                 bg=theme.HEADER, fg="#cfd5e3").pack(side="right", padx=14)
 
-        self.listbox = tk.Listbox(body, font=(None, 12))
+        body = tk.Frame(self, bg=theme.BG)
+        body.pack(fill="both", expand=True, padx=16, pady=(14, 8))
+
+        self.listbox = tk.Listbox(body, font=theme.FONT, relief="flat", bd=0,
+                                  bg=theme.PANEL, fg=theme.TEXT, highlightthickness=1,
+                                  highlightbackground="#d7deef",
+                                  selectbackground=theme.ACCENT, selectforeground="white",
+                                  activestyle="none")
         self.listbox.pack(side="left", fill="both", expand=True)
         self.listbox.bind("<Double-Button-1>", lambda e: self._join())
         scrollbar = tk.Scrollbar(body, command=self.listbox.yview)
         scrollbar.pack(side="right", fill="y")
         self.listbox.config(yscrollcommand=scrollbar.set)
 
-        buttons = tk.Frame(self)
-        buttons.pack(fill="x", padx=16, pady=12)
-        tk.Button(buttons, text="Refresh", command=self._refresh).pack(side="left", padx=4)
-        tk.Button(buttons, text="New Project", command=self._create).pack(side="left", padx=4)
-        tk.Button(buttons, text="Open", command=self._join).pack(side="left", padx=4)
-        tk.Button(buttons, text="Delete", command=self._delete).pack(side="left", padx=4)
+        buttons = tk.Frame(self, bg=theme.BG)
+        buttons.pack(fill="x", padx=16, pady=(0, 14))
+        theme.button(buttons, "Refresh", self._refresh).pack(side="left", padx=(0, 6))
+        theme.button(buttons, "New Project", self._create, primary=True).pack(side="left", padx=6)
+        theme.button(buttons, "Open", self._join, primary=True).pack(side="left", padx=6)
+        theme.button(buttons, "Delete", self._delete).pack(side="left", padx=6)
 
     def _refresh(self):
         self.net.send(MessageType.PROJECT_LIST)

@@ -6,6 +6,7 @@ Ketikan kita di-diff sama "shadow" (copy text terakhir yang udah sinkron) buat d
 import tkinter as tk
 
 from shared.protocol import MessageType
+from gui import theme
 
 
 class TextEditorFrame(tk.Frame):
@@ -26,18 +27,22 @@ class TextEditorFrame(tk.Frame):
         self._build_contents()
 
     def _build_contents(self):
-        self.header = tk.Label(self, text="No file open", bg=self.bg_color,
-                               font=(None, 12, "bold"))
-        self.header.pack(fill="x", padx=8, pady=(8, 4))
+        self.header = theme.header(self, "No file open")
+        self.header.pack(fill="x")
 
-        editor_container = tk.Frame(self)
-        editor_container.pack(fill="both", expand=True, padx=8, pady=(0, 8))
+        editor_container = tk.Frame(self, bg=self.bg_color)
+        editor_container.pack(fill="both", expand=True, padx=8, pady=8)
 
-        self.line_numbers = tk.Text(editor_container, width=4, padx=4, pady=4, bd=0,
-                                    bg="#ececec", fg="#555555", state="disabled", takefocus=0)
+        mono = ("Consolas", 11)
+        self.line_numbers = tk.Text(editor_container, width=4, padx=6, pady=6, bd=0,
+                                    bg="#f1f3f9", fg=theme.MUTED, font=mono,
+                                    state="disabled", takefocus=0)
         self.line_numbers.pack(side="left", fill="y")
 
-        self.text_widget = tk.Text(editor_container, wrap="word", undo=True, state="disabled")
+        self.text_widget = tk.Text(editor_container, wrap="word", undo=True, state="disabled",
+                                   bd=0, padx=8, pady=6, font=mono, fg=theme.TEXT,
+                                   bg=theme.PANEL, insertbackground=theme.ACCENT,
+                                   selectbackground="#cfe0ff")
         self.scrollbar = tk.Scrollbar(editor_container, command=self._on_scroll)
         self.text_widget.configure(yscrollcommand=self._on_text_scroll)
 
