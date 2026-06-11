@@ -1,44 +1,71 @@
+"""Titik masuk client. Jalanin dari root project: python -m client.main
+Pakai 1 root Tk yang gantian nampilin Login => Lobby => Editor, dan tiap 50 ms ngecek inbox jaringan biar update GUI tetap di main thread."""
+
+import os
+import sys
 import tkinter as tk
-from tkinter import ttk
-from gui.main_window import TkinterApp
 
-example_chat = [
-    {"name": "system", "timestamp": "2023-04-01 12:00:00", "content": "You are a helpful assistant."},
-    {"name": "system", "timestamp": "2023-04-01 12:00:00", "content": "You are a helpful assistant."},
-]
+# biar root project + folder client kebaca, dua cara jalanin sama-sama bisa
+_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(_THIS_DIR)
+for _p in (_ROOT, _THIS_DIR):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
-example_project_dir = [
-    {"type": "dir", "name": "Project1", "children": [
-        {"type": "file", "name": "main.py"},
-        {"type": "file", "name": "utils.py"},
-        {"type": "dir", "name": "data", "children": [
-            {"type": "file", "name": "data.csv"},
-            {"type": "file", "name": "info.json"},
-        ]},
-    ]},
-    {"type": "file", "name": "README.md"},
-    {"type": "file", "name": "requirements.txt"},
-]
+from client.network.net_client import NetClient
+from gui.login import LoginFrame
+from gui.lobby import LobbyFrame
+from gui.main_window import EditorScreen
 
 
-class ColumnFrame(tk.Frame):
-    def __init__(self, parent, bg_color, text, items=None, **kwargs):
-        super().__init__(parent, bg=bg_color, **kwargs)
-        self.bg_color = bg_color
-        self.text = text
-        self.items = items or []
-        self._build_contents()
+class App:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Collaborative Editor")
+        self.root.geometry("1280x760")
+        self.root.protocol("WM_DELETE_WINDOW", self._quit)
 
-    def _build_contents(self):
-        for item in self.items:
-            item_label = tk.Label(self, text=item, bg=self.bg_color)
-            item_label.pack(anchor="w", padx=10, pady=5)
+        self.net = NetClient()
+        self.username = None
+        self.current_frame = None
 
-        footer_label = tk.Label(self, text=self.text, bg=self.bg_color)
-        footer_label.pack(expand=True)
+        self._show_login()
+        self.root.after(50, self._pump)
 
+    def _swap(self, frame):
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+        self.current_frame = frame
+        frame.pack(fill="both", expand=True)
+
+    def _show_login(self):
+        self._swap(LoginFrame(self.root, self.net, on_logged_in=self._on_logged_in))
+
+    def _on_logged_in(self, username):
+        self.username = username
+        self.root.title(f"Collaborative Editor — {username}")
+        self._show_lobby()
+
+    def _show_lobby(self):
+        self._swap(LobbyFrame(self.root, self.net, self.username, on_joined=self._on_joined))
+
+    def _on_joined(self, room_id):
+        from shared.protocol import MessageType
+        # bikin layar editor dulu (biar handler-nya kepasang) baru kirim JOIN, biar balasan JOIN-nya ga kelewat
+        self._swap(EditorScreen(self.root, self.net, room_id, on_leave=self._show_lobby))
+        self.net.send(MessageType.JOIN_PROJECT, room_id=room_id)
+
+    def _pump(self):
+        self.net.pump()
+        self.root.after(50, self._pump)
+
+    def _quit(self):
+        self.net.close()
+        self.root.destroy()
+
+    def run(self):
+        self.root.mainloop()
 
 
 if __name__ == "__main__":
-    app = TkinterApp()
-    app.run()
+    App().run()
