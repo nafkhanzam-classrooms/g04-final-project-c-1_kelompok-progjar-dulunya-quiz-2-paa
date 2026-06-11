@@ -6,38 +6,38 @@ import json
 # kumpulan packet_type, dipakai bareng server sama client biar ga salah ketik
 class MessageType:
     # auth / session
-    AUTH = "AUTH"                    # client -> server : { username }
-    AUTH_RESULT = "AUTH_RESULT"      # server -> client : { ok, user_id, message }
+    AUTH = "AUTH" # client => server : { username }
+    AUTH_RESULT = "AUTH_RESULT" # server => client : { ok, user_id, message }
 
     # project (1 project = 1 room, intinya folder di storage)
-    PROJECT_LIST = "PROJECT_LIST"            # client -> server : (no body)
-    PROJECT_LIST_RESULT = "PROJECT_LIST_RESULT"  # server -> client : { projects: [..] }
-    CREATE_PROJECT = "CREATE_PROJECT"        # client -> server : { name }
-    JOIN_PROJECT = "JOIN_PROJECT"            # client -> server : { room_id }
-    DELETE_PROJECT = "DELETE_PROJECT"        # client -> server : { room_id }
-    LEAVE_PROJECT = "LEAVE_PROJECT"          # client -> server : { room_id }
-    ROOM_STATE = "ROOM_STATE"                # server -> client : { room_id, members, tree }
+    PROJECT_LIST = "PROJECT_LIST" # client => server : (no body)
+    PROJECT_LIST_RESULT = "PROJECT_LIST_RESULT" # server => client : { projects: [..] }
+    CREATE_PROJECT = "CREATE_PROJECT" # client => server : { name }
+    JOIN_PROJECT = "JOIN_PROJECT" # client => server : { room_id }
+    DELETE_PROJECT = "DELETE_PROJECT" # client => server : { room_id }
+    LEAVE_PROJECT = "LEAVE_PROJECT" # client => server : { room_id }
+    ROOM_STATE = "ROOM_STATE" # server => client : { room_id, members, tree }
 
     # file
-    FILE_LIST = "FILE_LIST"                  # client -> server : { room_id }
-    FILE_LIST_RESULT = "FILE_LIST_RESULT"    # server -> client : { room_id, tree }
-    FILE_OPEN = "FILE_OPEN"                  # client -> server : { room_id, path }
-    FILE_CONTENT = "FILE_CONTENT"            # server -> client : { room_id, path, content, version }
-    FILE_SYSTEM = "FILE_SYSTEM"              # create/delete/rename
+    FILE_LIST = "FILE_LIST" # client => server : { room_id }
+    FILE_LIST_RESULT = "FILE_LIST_RESULT" # server => client : { room_id, tree }
+    FILE_OPEN = "FILE_OPEN" # client => server : { room_id, path }
+    FILE_CONTENT = "FILE_CONTENT" # server => client : { room_id, path, content, version }
+    FILE_SYSTEM = "FILE_SYSTEM" # create/delete/rename
 
     # collaboration
     EDIT = "EDIT"
     CHAT = "CHAT"
-    PRIVATE_CHAT = "PRIVATE_CHAT"            # direct message : { room_id, sender_id, target_id, message, timestamp }
+    PRIVATE_CHAT = "PRIVATE_CHAT" # direct message : { room_id, sender_id, target_id, message, timestamp }
     TYPING = "TYPING"
-    REACTION = "REACTION"                    # client -> server : { room_id, message_id, emoji }
-    REACTION_UPDATE = "REACTION_UPDATE"      # server -> client : { room_id, message_id, reactions }
-    CHAT_HISTORY = "CHAT_HISTORY"            # server -> client : { room_id, messages }
-    PRESENCE = "PRESENCE"                    # server -> client : { room_id, members }
+    REACTION = "REACTION" # client => server : { room_id, message_id, emoji }
+    REACTION_UPDATE = "REACTION_UPDATE" # server => client : { room_id, message_id, reactions }
+    CHAT_HISTORY = "CHAT_HISTORY" # server => client : { room_id, messages }
+    PRESENCE = "PRESENCE" # server => client : { room_id, members }
 
     # respon umum
-    ACK = "ACK"                              # server -> client : { ref, message }
-    ERROR = "ERROR"                          # server -> client : { code, message }
+    ACK = "ACK" # server => client : { ref, message }
+    ERROR = "ERROR" # server => client : { code, message }
 
 
 @dataclass
