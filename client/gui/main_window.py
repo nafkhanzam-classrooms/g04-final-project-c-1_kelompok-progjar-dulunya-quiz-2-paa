@@ -113,3 +113,5 @@ class EditorScreen(tk.Frame):
 
     def _on_error(self, message):
         messagebox.showerror("Error", message.get("message", "Error"), parent=self)
+        if (message.get("code") == "NO_PROJECT"):
+            self.on_leave()
