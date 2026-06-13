@@ -150,6 +150,9 @@ class ClientHandler(threading.Thread):
 
     def _handle_delete_project(self, message):
         room_id = (message.get("room_id") or "").strip()
+        room = self.controller.get_room(room_id)
+        if room and self.controller.get_room(room_id).is_empty() is False:
+            return self.error(f"Cannot delete '{room_id}': still has members", code="ROOM_NOT_EMPTY")
         self.controller.file_manager.delete_project(room_id)
         self.controller.ot_engine.drop_document(room_id)
         self.controller.chat_manager.clear(room_id)
