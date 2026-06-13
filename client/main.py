@@ -22,7 +22,7 @@ from gui.main_window import EditorScreen
 class App:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("Collaborative Editor")
+        self.root.title("Pairs Code")
         self.root.geometry("1280x760")
         self.root.configure(bg=theme.BG)
         self.root.protocol("WM_DELETE_WINDOW", self._quit)
@@ -45,7 +45,7 @@ class App:
 
     def _on_logged_in(self, username):
         self.username = username
-        self.root.title(f"Collaborative Editor — {username}")
+        self.root.title(f"Pairs Code — {username}")
         self._show_lobby()
 
     def _show_lobby(self):

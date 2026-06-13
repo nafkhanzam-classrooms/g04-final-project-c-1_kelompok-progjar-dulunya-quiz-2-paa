@@ -17,7 +17,7 @@ class LoginFrame(tk.Frame):
         card = tk.Frame(self, bg=theme.PANEL, padx=34, pady=28)
         card.place(relx=0.5, rely=0.5, anchor="center")
 
-        tk.Label(card, text="Collaborative Editor", font=theme.FONT_TITLE,
+        tk.Label(card, text="Pairs Code", font=theme.FONT_TITLE,
                  bg=theme.PANEL, fg=theme.TEXT).grid(row=0, column=0, columnspan=2)
         tk.Label(card, text="masuk dulu buat mulai kolaborasi", font=theme.FONT_SM,
                  bg=theme.PANEL, fg=theme.MUTED).grid(row=1, column=0, columnspan=2, pady=(2, 20))
