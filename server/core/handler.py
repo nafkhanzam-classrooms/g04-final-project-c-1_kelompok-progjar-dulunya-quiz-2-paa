@@ -157,7 +157,9 @@ class ClientHandler(threading.Thread):
         self._handle_project_list(message)
 
     def _handle_leave_project(self, message):
+        room_id = (message.get("room_id") or "").strip()
         self.controller.leave_room(self)
+        log.info("%s left project '%s'", self.username, room_id)
         self.send(MessageType.ACK, ref=MessageType.LEAVE_PROJECT, message="Left project")
 
     def _require_room(self, message):
