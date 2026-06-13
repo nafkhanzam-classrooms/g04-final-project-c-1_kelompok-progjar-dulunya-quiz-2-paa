@@ -154,3 +154,6 @@ class ServerController:
             return
         payload = msg(MessageType.PRESENCE, room_id=room_id, members=room.member_ids())
         self.broadcast_to_room(room_id, payload)
+
+    def list_all_users(self):
+        return sorted(self._users.keys())

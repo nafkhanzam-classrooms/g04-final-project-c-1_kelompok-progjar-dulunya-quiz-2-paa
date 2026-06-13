@@ -89,6 +89,7 @@ class ClientHandler(threading.Thread):
             MessageType.PRIVATE_CHAT: self._handle_private_chat,
             MessageType.REACTION: self._handle_reaction,
             MessageType.TYPING: self._handle_typing,
+            MessageType.SHOW_ALL_USERS: self._handle_show_all_users,
         }
         func = handlers.get(ptype)
         if func is None:
@@ -149,6 +150,9 @@ class ClientHandler(threading.Thread):
 
     def _handle_delete_project(self, message):
         room_id = (message.get("room_id") or "").strip()
+        room = self.controller.get_room(room_id)
+        if room and self.controller.get_room(room_id).is_empty() is False:
+            return self.error(f"Cannot delete '{room_id}': still has members", code="ROOM_NOT_EMPTY")
         self.controller.file_manager.delete_project(room_id)
         self.controller.ot_engine.drop_document(room_id)
         self.controller.chat_manager.clear(room_id)
@@ -157,7 +161,9 @@ class ClientHandler(threading.Thread):
         self._handle_project_list(message)
 
     def _handle_leave_project(self, message):
+        room_id = (message.get("room_id") or "").strip()
         self.controller.leave_room(self)
+        log.info("%s left project '%s'", self.username, room_id)
         self.send(MessageType.ACK, ref=MessageType.LEAVE_PROJECT, message="Left project")
 
     def _require_room(self, message):
@@ -302,3 +308,6 @@ class ClientHandler(threading.Thread):
                 is_typing=bool(message.get("is_typing"))),
             exclude_user=self.username,
         )
+
+    def _handle_show_all_users(self, message):
+        self.send(MessageType.SHOW_ALL_USERS_RESULT, users=self.controller.list_all_users())
