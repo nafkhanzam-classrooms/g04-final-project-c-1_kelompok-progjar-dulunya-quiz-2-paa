@@ -78,6 +78,8 @@ class CliClient:
         elif t == MessageType.CHAT_HISTORY:
             for e in m.get("messages", []):
                 print(f"  <history> {e['sender_id']}: {e['message']}")
+        elif t == MessageType.SHOW_ALL_USERS_RESULT:
+            print(f"\n  <all_users> {m.get('users')}")
         else:
             print(f"\n  <{t}> {m}")
         print("> ", end="", flush=True)
@@ -115,6 +117,8 @@ class CliClient:
             self._running = False
         elif cmd == "/projects":
             self.send(MessageType.PROJECT_LIST)
+        elif cmd == "/members":
+            self.send(MessageType.SHOW_ALL_USERS)
         elif cmd == "/create":
             self.send(MessageType.CREATE_PROJECT, name=arg)
         elif cmd == "/join":

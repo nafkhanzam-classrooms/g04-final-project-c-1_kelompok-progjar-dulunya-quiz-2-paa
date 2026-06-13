@@ -17,6 +17,8 @@ class MessageType:
     DELETE_PROJECT = "DELETE_PROJECT" # client => server : { room_id }
     LEAVE_PROJECT = "LEAVE_PROJECT" # client => server : { room_id }
     ROOM_STATE = "ROOM_STATE" # server => client : { room_id, members, tree }
+    SHOW_ALL_USERS = "SHOW_ALL_USERS" # client => server : (no body)
+    SHOW_ALL_USERS_RESULT = "SHOW_ALL_USERS_RESULT" # server => client : { users: [ { username } ] }
 
     # file
     FILE_LIST = "FILE_LIST" # client => server : { room_id }

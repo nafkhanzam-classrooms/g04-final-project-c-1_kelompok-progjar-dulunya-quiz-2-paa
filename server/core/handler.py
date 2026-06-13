@@ -89,6 +89,7 @@ class ClientHandler(threading.Thread):
             MessageType.PRIVATE_CHAT: self._handle_private_chat,
             MessageType.REACTION: self._handle_reaction,
             MessageType.TYPING: self._handle_typing,
+            MessageType.SHOW_ALL_USERS: self._handle_show_all_users,
         }
         func = handlers.get(ptype)
         if func is None:
@@ -304,3 +305,6 @@ class ClientHandler(threading.Thread):
                 is_typing=bool(message.get("is_typing"))),
             exclude_user=self.username,
         )
+
+    def _handle_show_all_users(self, message):
+        self.send(MessageType.SHOW_ALL_USERS_RESULT, users=self.controller.list_all_users())
